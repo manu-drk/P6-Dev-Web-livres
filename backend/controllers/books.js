@@ -1,23 +1,60 @@
 const Book = require('../models/book');
+
 const fs = require('fs');
 const path = require('path');
 
+console.log('Book model:', Book);
+
 // POST => Enregistrement d'un livre
+// exports.createBook = (req, res, next) => {
+//     const bookObject = JSON.parse(req.body.book);
+//     delete bookObject._id;
+//     delete bookObject._userId;
+
+//     const book = new Book({
+//         ...bookObject,
+//         userId: req.auth.userId,
+//         imageUrl: `${req.protocol}://${req.get('host')}/images/resized_${req.file.filename}`,
+//         averageRating: bookObject.ratings[0].grade
+//     });
+
+//     book.save()
+//         .then(() => res.status(201).json({ message: 'Objet enregistré !' }))
+//         .catch(error => res.status(400).json({ error }));
+// };
+
 exports.createBook = (req, res, next) => {
-    const bookObject = JSON.parse(req.body.book);
-    delete bookObject._id;
-    delete bookObject._userId;
+    console.log('req.file:', req.file);
+    // Vérifie si le paramètre 'book' est une chaîne de caractères
+    if (typeof req.body.book === 'string') {
+        try {
+            // Parse la chaîne JSON 'book' en objet JavaScript
+            const bookObject = JSON.parse(req.body.book);
+            console.log('bookObject:', bookObject);
+            // Supprime les clés '_id' et '_userId'
+            delete bookObject._id;
+            delete bookObject._userId;
 
-    const book = new Book({
-        ...bookObject,
-        userId: req.auth.userId,
-        imageUrl: `${req.protocol}://${req.get('host')}/images/resized_${req.file.filename}`,
-        averageRating: bookObject.ratings[0].grade
-    });
+            // Crée un nouvel objet Book avec les données du livre
+            const book = new Book({
+                ...bookObject,
+                userId: req.auth.userId,
+                imageUrl: `${req.protocol}://${req.get('host')}/images/resized_${req.file.filename}`,
+                averageRating: 0, // Initialise la note moyenne à 0
+                ratings: [] // Initialise le tableau de ratings à vide
+            });
 
-    book.save()
-        .then(() => res.status(201).json({ message: 'Objet enregistré !' }))
-        .catch(error => res.status(400).json({ error }));
+            // Enregistre le livre dans la base de données
+            book.save()
+                .then(() => res.status(201).json({ message: 'Livre enregistré !' }))
+                .catch(error => res.status(400).json({ error }));
+        } catch (error) {
+            console.error('Erreur lors de la création du livre :', error);
+            res.status(400).json({ error: 'Les données JSON du livre sont invalides' });
+        }
+    } else {
+        res.status(400).json({ error: 'Le paramètre "book" est manquant ou invalide dans la requête' });
+    }
 };
 
 exports.getOneBook = (req, res, next) => {

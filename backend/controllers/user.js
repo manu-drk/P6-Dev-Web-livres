@@ -18,14 +18,19 @@ exports.signup = [
 
         bcrypt.hash(req.body.password, 10)
             .then(hash => {
+                console.log('Mot de passe hashé');
                 const user = new User({
-                    email: email,
+                    email: req.body.email,
                     password: hash
                 });
                 return user.save();
             })
-            .then(() => res.status(201).json({ message: 'Utilisateur créé !' }))
+            .then(() => {
+                console.log('Utilisateur enregistré avec succès');
+                res.status(201).json({ message: 'Utilisateur créé !' });
+            })
             .catch(error => {
+                console.error('Erreur lors de l\'enregistrement de l\'utilisateur :', error);
                 if (error.name === 'ValidationError') {
                     res.status(400).json({ error: error.message });
                 } else {
