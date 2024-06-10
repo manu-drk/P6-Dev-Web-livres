@@ -1,9 +1,10 @@
 const mongoose = require('mongoose');
 const express = require('express');
-const booksRoutes = require('./routes/books');
 const path = require('path');
-
+const booksRoutes = require('./routes/books');
 const userRoutes = require('./routes/user');
+const app = express();
+
 
 mongoose.connect(
     'mongodb+srv://manudossantos06:sNzqPNrysirXRTPU@clusterp6.eeylxga.mongodb.net/',
@@ -13,9 +14,12 @@ mongoose.connect(
     },
 )
     .then(() => console.log('Connexion à MongoDB réussie !'))
-    .catch(() => console.log('Connexion à MongoDB échouée !'));
+    // .catch(() => console.log('Connexion à MongoDB échouée !'));
+    .catch((err) => {
+        console.error('Erreur de connexion à MongoDB :', err);
+    });
 
-const app = express();
+
 
 app.use(express.json());
 
