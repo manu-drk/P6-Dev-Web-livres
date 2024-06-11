@@ -5,23 +5,6 @@ const path = require('path');
 
 console.log('Book model:', Book);
 
-// POST => Enregistrement d'un livre
-// exports.createBook = (req, res, next) => {
-//     const bookObject = JSON.parse(req.body.book);
-//     delete bookObject._id;
-//     delete bookObject._userId;
-
-//     const book = new Book({
-//         ...bookObject,
-//         userId: req.auth.userId,
-//         imageUrl: `${req.protocol}://${req.get('host')}/images/resized_${req.file.filename}`,
-//         averageRating: bookObject.ratings[0].grade
-//     });
-
-//     book.save()
-//         .then(() => res.status(201).json({ message: 'Objet enregistré !' }))
-//         .catch(error => res.status(400).json({ error }));
-// };
 
 exports.createBook = (req, res, next) => {
     console.log('req.file:', req.file);
@@ -39,9 +22,8 @@ exports.createBook = (req, res, next) => {
             const book = new Book({
                 ...bookObject,
                 userId: req.auth.userId,
-                imageUrl: `${req.protocol}://${req.get('host')}/images/resized_${req.file.filename}`,
-                averageRating: 0, // Initialise la note moyenne à 0
-                ratings: [] // Initialise le tableau de ratings à vide
+                imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`,
+                
             });
 
             // Enregistre le livre dans la base de données
@@ -66,7 +48,7 @@ exports.getOneBook = (req, res, next) => {
 exports.modifyBook = (req, res, next) => {
     const bookObject = req.file ? {
         ...JSON.parse(req.body.book),
-        imageUrl: `${req.protocol}://${req.get('host')}/images/resized_${req.file.filename}`
+        imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
     } : { ...req.body };
 
     delete bookObject._userId;
@@ -76,12 +58,19 @@ exports.modifyBook = (req, res, next) => {
             if (book.userId != req.auth.userId) {
                 res.status(403).json({ message: '403: unauthorized request' });
             } else {
+                // const filename = book.imageUrl.split('/images/')[1];
+                // if (req.file) {
+                //     fs.unlink(`images/${filename}`, (err) => {
+                //         if (err) console.log(err);
+                //     });
+                // }
                 const filename = book.imageUrl.split('/images/')[1];
-                if (req.file) {
-                    fs.unlink(`images/${filename}`, (err) => {
-                        if (err) console.log(err);
-                    });
-                }
+if (req.file) {
+    const imagePath = path.join(__dirname, '..', 'images', filename);
+    fs.unlink(imagePath, (err) => {
+        if (err) console.log(err);
+    });
+}
                 Book.updateOne({ _id: req.params.id }, { ...bookObject, _id: req.params.id })
                     .then(() => res.status(200).json({ message: 'Objet modifié !' }))
                     .catch(error => res.status(400).json({ error }));
@@ -140,6 +129,11 @@ exports.createRating = (req, res, next) => {
                 const totalGrades = book.ratings.reduce((acc, rating) => acc + rating.grade, 0);
                 const averageGrades = totalGrades / book.ratings.length;
                 book.averageRating = averageGrades;
+
+                // Si c'est la première note, initialiser averageRating
+                if (book.ratings.length === 1) {
+                    book.averageRating = rating;
+                }
 
                 // Enregistrer les modifications
                 book.save()
