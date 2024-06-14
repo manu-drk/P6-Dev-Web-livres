@@ -1,10 +1,10 @@
 const mongoose = require('mongoose');
 const express = require('express');
 const path = require('path');
+const rateLimit = require('express-rate-limit');
 const booksRoutes = require('./routes/books');
 const userRoutes = require('./routes/user');
 const app = express();
-
 
 mongoose.connect(
     'mongodb+srv://manudossantos06:sNzqPNrysirXRTPU@clusterp6.eeylxga.mongodb.net/',
@@ -14,12 +14,9 @@ mongoose.connect(
     },
 )
     .then(() => console.log('Connexion à MongoDB réussie !'))
-    // .catch(() => console.log('Connexion à MongoDB échouée !'));
     .catch((err) => {
         console.error('Erreur de connexion à MongoDB :', err);
     });
-
-
 
 app.use(express.json());
 
@@ -31,7 +28,15 @@ app.use((req, res, next) => {
     next();
 });
 
+// Configuration du rate limit
+const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100, // Limite chaque IP à 100 requêtes par windowMs
+    message: 'Trop de requêtes depuis cette IP, veuillez réessayer plus tard.'
+});
 
+// Appliquer le rate limit à toutes les requêtes
+app.use(limiter);
 
 app.use('/api/books', booksRoutes);
 app.use('/api/auth', userRoutes);
