@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const express = require('express');
 const path = require('path');
 const rateLimit = require('express-rate-limit');
-// const helmet = require('./middleware/helmet');
+const helmet = require('helmet');
 const booksRoutes = require('./routes/books');
 const userRoutes = require('./routes/user');
 const app = express();
@@ -19,7 +19,7 @@ mongoose.connect(
         console.error('Erreur de connexion à MongoDB :', err);
     });
 
-// app.use(helmet()); 
+app.use(helmet({crossOriginResourcePolicy: false})); 
 
 app.use(express.json());
 
