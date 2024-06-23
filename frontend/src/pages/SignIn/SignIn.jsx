@@ -9,6 +9,8 @@ import { storeInLocalStorage } from '../../lib/common';
 import { ReactComponent as Logo } from '../../images/Logo.svg';
 import styles from './SignIn.module.css';
 
+import { validatePassword } from './validate-password';
+
 function SignIn({ setUser }) {
   const navigate = useNavigate();
   const { user, authenticated } = useUser();
@@ -23,6 +25,13 @@ function SignIn({ setUser }) {
   const signIn = async () => {
     try {
       setIsLoading(true);
+
+      const validationResult = validatePassword(password);
+      if (validationResult.error) {
+        setNotification({ error: true, message: validationResult.message });
+        return;
+      }
+
       const response = await axios({
         method: 'post',
         url: API_ROUTES.SIGN_IN,
