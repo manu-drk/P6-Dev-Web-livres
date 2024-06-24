@@ -1,3 +1,4 @@
+require('dotenv').config();
 const mongoose = require('mongoose');
 const express = require('express');
 const path = require('path');
@@ -5,10 +6,16 @@ const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
 const booksRoutes = require('./routes/books');
 const userRoutes = require('./routes/user');
+
 const app = express();
 
+// const uri = `mongodb+srv://${process.env.MONGO_USERNAME}:${process.env.MONGO_PASSWORD}@${process.env.MONGO_CLUSTER}/${process.env.MONGO_DB_NAME}?retryWrites=true&w=majority`;
+// mongoose.connect(uri, {
+//     useNewUrlParser: true,
+//     useUnifiedTopology: true,
+// })
 mongoose.connect(
-    'mongodb+srv://manudossantos06:sNzqPNrysirXRTPU@clusterp6.eeylxga.mongodb.net/',
+    `mongodb+srv://${process.env.MONGO_USERNAME}:${process.env.MONGO_PASSWORD}@${process.env.MONGO_CLUSTER}/`,
     {
         useNewUrlParser: true,
         useUnifiedTopology: true,
