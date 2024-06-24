@@ -1,4 +1,9 @@
+const express = require('express');
+const bodyParser = require('body-parser');
 const passwordValidator = require('password-validator');
+
+const app = express();
+app.use(bodyParser.json());
 
 // Créer un schema pour le validateur de mot de passe
 const schema = new passwordValidator();
@@ -12,7 +17,7 @@ schema
     .has().digits()                                 // Doit avoir au moins un chiffre
     .has().not().spaces();                          // Ne doit pas contenir d'espaces
 
-// // Middleware pour valider un mot de passe
+// Middleware pour valider un mot de passe
 const validatePassword = (req, res, next) => {
     const { password } = req.body;
 
@@ -24,5 +29,13 @@ const validatePassword = (req, res, next) => {
     }
     next();
 };
+
+app.post('/register', validatePassword, (req, res) => {
+    res.status(200).send('Mot de passe valide !');
+});
+
+app.listen(3000, () => {
+    console.log('Serveur démarré sur le port 3000');
+});
 
 module.exports = validatePassword;

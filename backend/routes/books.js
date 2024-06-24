@@ -3,7 +3,7 @@ const router = express.Router();
 
 const auth = require('../middleware/auth');
 const multer = require('../middleware/multer-config');
-const sharpConfig = require('../middleware/sharp-config');
+const sharpConfig = require('../middleware/sharp_config');
 
 const booksCtrl = require('../controllers/books');
 

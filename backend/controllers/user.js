@@ -1,8 +1,11 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
+const validateEmail = require('../middleware/validate-email');
+const validatePassword = require('../middleware/validate-password');
 
-exports.signup = (req, res, next) => {
+// exports.signup = (req, res, next) => {
+    exports.signup = [validateEmail, validatePassword, (req, res, next) => {
     bcrypt.hash(req.body.password, 10)
       .then(hash => {
         const user = new User({
@@ -14,7 +17,7 @@ exports.signup = (req, res, next) => {
           .catch(error => res.status(400).json({ error }));
       })
       .catch(error => res.status(500).json({ error }));
-  };
+  }];
 
   exports.login = (req, res, next) => {
     User.findOne({ email: req.body.email })
