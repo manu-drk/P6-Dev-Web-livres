@@ -1,21 +1,28 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
+const validateEmail = require('../middleware/validate-email');
+const validatePassword = require('../middleware/validate-password');
 
 exports.signup = (req, res, next) => {
-    bcrypt.hash(req.body.password, 10)
-      .then(hash => {
-        const user = new User({
-          email: req.body.email,
-          password: hash
+    // Utiliser le middleware validateEmail pour valider l'email
+    validateEmail(req, res, () => {
+        // Utiliser le middleware validatePassword pour valider le mot de passe
+        validatePassword(req, res, () => {
+            bcrypt.hash(req.body.password, 10)
+                .then(hash => {
+                    const user = new User({
+                        email: req.body.email,
+                        password: hash
+                    });
+                    user.save()
+                        .then(() => res.status(201).json({ message: 'Utilisateur créé !' }))
+                        .catch(error => res.status(400).json({ error }));
+                })
+                .catch(error => res.status(500).json({ error }));
         });
-        user.save()
-          .then(() => res.status(201).json({ message: 'Utilisateur créé !' }))
-          .catch(error => res.status(400).json({ error }));
-      })
-      .catch(error => res.status(500).json({ error }));
-  };
-
+    });
+};
   exports.login = (req, res, next) => {
     User.findOne({ email: req.body.email })
         .then(user => {
