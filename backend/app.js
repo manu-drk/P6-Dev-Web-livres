@@ -2,7 +2,7 @@ require('dotenv').config();
 const mongoose = require('mongoose');
 const express = require('express');
 const path = require('path');
-const rateLimit = require('express-rate-limit');
+// const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
 const booksRoutes = require('./routes/books');
 const userRoutes = require('./routes/user');
@@ -38,15 +38,10 @@ app.use((req, res, next) => {
     next();
 });
 
-// Configuration du rate limit
-const limiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 100, // Limite chaque IP à 100 requêtes par windowMs
-    message: 'Trop de requêtes depuis cette IP, veuillez réessayer plus tard.'
-});
 
-// Appliquer le rate limit à toutes les requêtes
-app.use(limiter);
+
+
+app.use('/api/user', userRoutes); // Exemple d'utilisation des routes utilisateur
 
 app.use('/api/books', booksRoutes);
 app.use('/api/auth', userRoutes);
