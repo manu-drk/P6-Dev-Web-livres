@@ -15,11 +15,16 @@ const storage = multer.diskStorage({
         const extension = MIME_TYPES[file.mimetype];
         callback(null, name + Date.now() + '.' + extension);
     }
-    // filename: (req, file, callback) => {
+
+});
+
+module.exports = multer({ storage: storage }).single('image');
+
+
+
+
+   // filename: (req, file, callback) => {
     //     const cleanedFileName = slugify(file.originalname, { lower: true });
     //     const extension = MIME_TYPES[file.mimetype];
     //     callback(null, cleanedFileName + '-' + Date.now() + '.' + extension);
     // }
-});
-
-module.exports = multer({ storage: storage }).single('image');

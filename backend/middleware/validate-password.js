@@ -10,12 +10,18 @@ const schema = new passwordValidator();
 
 // Définir les règles pour le mot de passe
 schema
-    .is().min(8)                                    // Minimum 8 caractères
-    .is().max(100)                                  // Maximum 100 caractères
-    .has().uppercase()                              // Doit avoir au moins une lettre majuscule
-    .has().lowercase()                              // Doit avoir au moins une lettre minuscule
-    .has().digits()                                 // Doit avoir au moins un chiffre
-    .has().not().spaces();                          // Ne doit pas contenir d'espaces
+// Minimum 8 caractères
+    .is().min(8)
+// Maximum 100 caractères
+    .is().max(100)
+// Doit avoir au moins une lettre majuscule
+    .has().uppercase()
+// Doit avoir au moins une lettre minuscule
+    .has().lowercase()
+// Doit avoir au moins un chiffre
+    .has().digits()
+// Ne doit pas contenir d'espaces
+    .has().not().spaces();                          
 
 // Middleware pour valider un mot de passe
 const validatePassword = (req, res, next) => {
@@ -24,7 +30,8 @@ const validatePassword = (req, res, next) => {
     // Vérifier si le mot de passe respecte le schema défini
     if (!schema.validate(password)) {
         return res.status(400).json({
-            error: 'Le mot de passe doit contenir au moins 8 caractères, une lettre majuscule, une lettre minuscule, un chiffre et ne doit pas contenir d\'espaces.'
+            error:
+'Le mot de passe doit contenir au moins 8 caractères, une lettre majuscule, une lettre minuscule, un chiffre et ne doit pas contenir d\'espaces.'
         });
     }
     next();
