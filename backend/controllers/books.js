@@ -150,7 +150,7 @@ if (rating >= 0 && rating <= 5) {
         0
         );
         const averageGrades = totalGrades / book.ratings.length;
-        book.averageRating = averageGrades;
+        book.averageRating = averageGrades.toFixed(1);
 
         // Si c'est la première note, initialiser averageRating
         if (book.ratings.length === 1) {
